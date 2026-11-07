@@ -170,13 +170,17 @@ class GoveeConfigFlow(ConfigFlow, domain=DOMAIN):
             self._abort_if_unique_id_configured()
             return await self.async_step_effect_studio()
         issue = MODEL_PROFILES[model].confirmation_issue
-        assert issue is not None
+        # New experimental models may not have their own confirmation issue yet.
+        # Link to the support policy instead of aborting the setup flow.
+        feedback_url = (
+            f"https://github.com/teh-hippo/ha-govee-led-ble/issues/{issue}"
+            if issue is not None
+            else "https://github.com/teh-hippo/ha-govee-led-ble/blob/master/README.md#device-support"
+        )
         self._set_confirm_only()
         return self.async_show_form(
             step_id="experimental",
-            description_placeholders={
-                "feedback_url": f"https://github.com/teh-hippo/ha-govee-led-ble/issues/{issue}",
-            },
+            description_placeholders={"feedback_url": feedback_url},
         )
 
     async def async_step_effect_studio(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
