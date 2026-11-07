@@ -118,6 +118,23 @@ def test_h617f_uses_exact_scene_catalogue_with_h617a_wire_grammars():
     assert profile.command_grammar == profile.status_grammar == profile.effect_grammar == "H617A"
 
 
+def test_h7045_experimental_basic_ble_profile():
+    """Real-device trace establishes BLE name, encrypted basic RGB/brightness."""
+    profile = MODEL_PROFILES["H7045"]
+    assert profile.name == "H7045 Outdoor Chromatic String Lights"
+    assert profile.support_quality is SupportQuality.EXPERIMENTAL
+    assert model_from_ble_name("Govee_H7045_8167") == "H7045"
+    assert profile.command_grammar == "H617A"
+    assert profile.status_grammar == "H7025"
+    assert profile.command_operations == frozenset({"power", "brightness", "static"})
+    assert profile.supports_rgb
+    assert profile.segment_count == 10
+    assert profile.whole_device_mask == 0x03FF
+    assert not profile.supports_segments
+    assert not profile.supports_color_temperature
+    assert not profile.supports_scenes
+
+
 def test_support_quality_has_only_supported_and_experimental_states():
     assert set(SupportQuality) == {SupportQuality.EXPERIMENTAL, SupportQuality.SUPPORTED}
     assert const.H6199_PACT1_PROFILE.support_quality is SupportQuality.SUPPORTED
@@ -148,7 +165,7 @@ def test_support_quality_has_only_supported_and_experimental_states():
     }
     assert {
         model for model, profile in MODEL_PROFILES.items() if profile.support_quality is SupportQuality.EXPERIMENTAL
-    } == {"H6072", "H6117", "H6179", "H7025"}
+    } == {"H6072", "H6117", "H6179", "H7025", "H7045"}
 
 
 @pytest.mark.parametrize("pact", [(1, 1), (2, 1), (2, 2), (None, None), (3, 7)])
