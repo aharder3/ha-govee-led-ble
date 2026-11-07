@@ -1870,6 +1870,25 @@ MODEL_PROFILES: dict[str, ModelProfile] = {
         default_effect_families_override=frozenset({EFFECT_FAMILY_VIDEO}),
         effect_readback="scene_selector_for_user_effects",
     ),
+    # H7045: experimental basic-control candidate based on a decrypted real-device BLE trace.
+    # V2 encryption, brightness and static RGB observed; power write and readback
+    # must still be validated on a live HA connection. No per-bulb/scenes/Kelvin.
+    "H7045": ModelProfile(
+        "H7045 Outdoor Chromatic String Lights",
+        support_quality=SupportQuality.EXPERIMENTAL,
+        command_grammar="H617A",
+        status_grammar="H7025",
+        command_operations=frozenset({"power", "brightness", "static"}),
+        read_domains=frozenset(
+            {ReadDomain.POWER, ReadDomain.BRIGHTNESS, ReadDomain.COLOUR_MODE}
+        ),
+        setup_required_read_domains=frozenset({ReadDomain.POWER}),
+        supports_rgb=True,
+        # Ten bulbs on the observed hardware; whole-device RGB mask 0x03ff.
+        # Deliberately do not enable segment writes pending physical verification.
+        segment_count=10,
+        connection_idle_timeout=IDLE_TIMEOUT_STANDARD,
+    ),
     "H7025": ModelProfile(
         "H7025 Outdoor String Lights",
         support_quality=SupportQuality.EXPERIMENTAL,
